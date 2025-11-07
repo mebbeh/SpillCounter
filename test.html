@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDM Spill Counter - QE&A: Science</title>
+    <style>
+        :root {
+            /* Light Theme (Default) - Corporate */
+            --primary-color: #009024;
+            --primary-dark: #00701a;
+            --accent-color: #0066cc;
+            --background-color: #ffffff;
+            --surface-color: #f8f9fa;
+            --card-color: #ffffff;
+            --text-primary: #212121;
+            --text-secondary: #5f6368;
+            --text-disabled: #9e9e9e;
+            --border-color: #e0e0e0;
+            --hover-color: #f5f5f5;
+            --success-color: #34a853;
+            --error-color: #ea4335;
+            --warning-color: #fbbc04;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme - Cyberpunk Neon */
+            --primary-color: #ff0080;
+            --primary-dark: #cc0066;
+            --accent-color: #00ffff;
+            --background-color: #0a0a0a;
+            --surface-color: #1a1a1a;
+            --card-color: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-disabled: #666666;
+            --border-color: #333333;
+            --hover-color: #333333;
+            --success-color: #00ff00;
+            --error-color: #ff0040;
+            --warning-color: #ffff00;
+            --shadow: 0 0 10px rgba(255, 0, 128, 0.3), 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background-color);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 12px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 12px 0;
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--primary-color);
+            margin-bottom: 2px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            margin-bottom: 1px;
+        }
+
+        [data-theme="dark"] .subtitle {
+            color: var(--accent-color);
+            font-family: 'Courier New', 'Fira Code', monospace;
+            font-weight: normal;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+            position: relative;
+            line-height: 1.6;
+        }
+
+        [data-theme="dark"] .subtitle::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: 
+                repeating-linear-gradient(90deg, 
+                    transparent 0%, transparent 20%, 
+                    var(--accent-color) 20%, var(--accent-color) 80%, 
+                    transparent 80%, transparent 100%);
+            opacity: 0.8;
+            box-shadow: 0 0 3px var(--accent-color);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-color);
+            transform: scale(1.05);
+        }
+
+        .theme-toggle::before {
+            content: '☀️';
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .theme-toggle::before {
+            content: '🌙';
+        }
+
+        .card {
+            background: var(--card-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .file-input-container {
+            margin-bottom: 12px;
+        }
+
+        .file-input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: var(--surface-color);
+            border: 2px dashed var(--border-color);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input:hover {
+            border-color: var(--primary-color);
+            background: var(--hover-color);
+        }
+
+        .file-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(98, 0, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .button:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(98, 0, 234, 0.3);
+        }
+
+        .button:disabled {
+            background: var(--text-disabled);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .output {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            height: 500px;
+            overflow-y: auto;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .status-info { color: var(--text-secondary); }
+        .status-error { color: var(--error-color); font-weight: 500; }
+        .status-success { color: var(--success-color); font-weight: 500; }
+        .status-progress { color: var(--warning-color); font-weight: 500; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stat-card {
+            background: var(--surface-color);
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 2px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.3px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button {
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar styling */
+        .output::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .output::-webkit-scrollbar-track {
+            background: var(--background-color);
+        }
+
+        .output::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        [data-theme="dark"] .card {
+            border: 1px solid var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        [data-theme="dark"] .card:has(.output) {
+            border-color: var(--accent-color);
+        }
+
+        [data-theme="dark"] .button:hover:not(:disabled) {
+            box-shadow: 0 0 15px rgba(255, 0, 128, 0.5), 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+
+        [data-theme="dark"] .file-input:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(255, 0, 128, 0.3);
+        }
+
+        [data-theme="dark"] .title {
+            font-family: 'Courier New', 'Fira Code', monospace;
+            font-size: 1.8rem;
+            font-weight: bold;
+            line-height: 1.6;
+            position: relative;
+            color: transparent;
+            text-shadow: none;
+            margin-bottom: 10px;
+            padding-bottom: 0.32rem;
+        }
+
+        [data-theme="dark"] .title::before {
+            content: 
+                "▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄   ▄▄       ▄▄       ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄            ▄                 ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄         ▄  ▄▄        ▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄ \A" 
+                "▐░░░░░░░░░░░▌▐░░░░░░░░░░▌ ▐░░▌     ▐░░▌     ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌          ▐░▌               ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░░▌      ▐░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌\A"
+                "▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌▐░▌░▌   ▐░▐░▌     ▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌ ▀▀▀▀█░█▀▀▀▀ ▐░▌          ▐░▌               ▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌▐░▌       ▐░▌▐░▌░▌     ▐░▌ ▀▀▀▀█░█▀▀▀▀ ▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌\A"
+                "▐░▌          ▐░▌       ▐░▌▐░▌▐░▌ ▐░▌▐░▌     ▐░▌          ▐░▌       ▐░▌     ▐░▌     ▐░▌          ▐░▌               ▐░▌          ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌▐░▌    ▐░▌     ▐░▌     ▐░▌          ▐░▌       ▐░▌\A"
+                "▐░█▄▄▄▄▄▄▄▄▄ ▐░▌       ▐░▌▐░▌ ▐░▐░▌ ▐░▌     ▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄█░▌     ▐░▌     ▐░▌          ▐░▌               ▐░▌          ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌ ▐░▌   ▐░▌     ▐░▌     ▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄█░▌\A"
+                "▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░▌  ▐░▌  ▐░▌     ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌     ▐░▌     ▐░▌          ▐░▌               ▐░▌          ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌  ▐░▌  ▐░▌     ▐░▌     ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌\A"
+                "▐░█▀▀▀▀▀▀▀▀▀ ▐░▌       ▐░▌▐░▌   ▀   ▐░▌      ▀▀▀▀▀▀▀▀▀█░▌▐░█▀▀▀▀▀▀▀▀▀      ▐░▌     ▐░▌          ▐░▌               ▐░▌          ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌   ▐░▌ ▐░▌     ▐░▌     ▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀█░█▀▀ \A"
+                "▐░▌          ▐░▌       ▐░▌▐░▌       ▐░▌               ▐░▌▐░▌               ▐░▌     ▐░▌          ▐░▌               ▐░▌          ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌    ▐░▌▐░▌     ▐░▌     ▐░▌          ▐░▌     ▐░▌  \A"
+                "▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄█░▌▐░▌       ▐░▌      ▄▄▄▄▄▄▄▄▄█░▌▐░▌           ▄▄▄▄█░█▄▄▄▄ ▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄▄▄      ▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄█░▌▐░▌     ▐░▐░▌     ▐░▌     ▐░█▄▄▄▄▄▄▄▄▄ ▐░▌      ▐░▌ \A"
+                "▐░░░░░░░░░░░▌▐░░░░░░░░░░▌ ▐░▌       ▐░▌     ▐░░░░░░░░░░░▌▐░▌          ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌     ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌      ▐░░▌     ▐░▌     ▐░░░░░░░░░░░▌▐░▌       ▐░▌\A"
+                "▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀   ▀         ▀       ▀▀▀▀▀▀▀▀▀▀▀  ▀            ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀       ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀        ▀▀       ▀       ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀ ";
+            white-space: pre;
+            color: var(--primary-color);
+            text-shadow: 
+                0 0 2px rgba(255, 0, 128, 0.9),
+                0 0 4px rgba(255, 0, 128, 0.7),
+                0 0 6px rgba(255, 0, 128, 0.5);
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            font-size: 0.35rem;
+            line-height: 0.4;
+            letter-spacing: 0;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="theme-toggle" id="themeToggle" title="Toggle theme"></div>
+
+        <header class="header">
+            <h1 class="title">EDM Spill Counter</h1>
+            <p class="subtitle">QE&A: Science</p>
+        </header>
+
+        <div class="card">
+            <h2 class="card-title">Data Processing</h2>
+
+            <div class="file-input-container">
+                <label for="fileInput">Select Data File</label>
+                <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" class="file-input" title="Choose a CSV or Excel file to process">
+            </div>
+
+            <div class="button-group">
+                <button id="processBtn" class="button" disabled>Process Data</button>
+                <button id="exportBtn" class="button" disabled>Export Results</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Processing Log</h2>
+            <div class="output" id="output"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        let selectedFile = null;
+        let exportData = '';
+
+        const fileInput = document.getElementById('fileInput');
+        const processBtn = document.getElementById('processBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const output = document.getElementById('output');
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Theme toggle functionality
+        themeToggle.addEventListener('click', () => {
+            try {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+                document.documentElement.setAttribute('data-theme', newTheme);
+                
+                // Try localStorage, fall back to sessionStorage if blocked
+                try {
+                    localStorage.setItem('theme', newTheme);
+                } catch (e) {
+                    try {
+                        sessionStorage.setItem('theme', newTheme);
+                    } catch (e2) {
+                        // If both storage methods fail, theme won't persist
+                        console.log('Theme persistence not available in this environment');
+                    }
+                }
+                
+                console.log('Theme toggled to:', newTheme);
+            } catch (error) {
+                console.error('Theme toggle failed:', error);
+                // Fallback: try direct style manipulation
+                try {
+                    const body = document.body;
+                    const currentBg = getComputedStyle(body).backgroundColor;
+                    if (currentBg.includes('rgb(10, 10, 10)') || currentBg.includes('#0a0a0a')) {
+                        // Currently dark, switch to light
+                        document.documentElement.style.setProperty('--background-color', '#ffffff');
+                        document.documentElement.style.setProperty('--text-primary', '#212121');
+                        document.documentElement.style.setProperty('--surface-color', '#f8f9fa');
+                        console.log('Fallback: switched to light theme');
+                    } else {
+                        // Currently light, switch to dark
+                        document.documentElement.style.setProperty('--background-color', '#0a0a0a');
+                        document.documentElement.style.setProperty('--text-primary', '#ffffff');
+                        document.documentElement.style.setProperty('--surface-color', '#1a1a1a');
+                        console.log('Fallback: switched to dark theme');
+                    }
+                } catch (fallbackError) {
+                    console.error('Fallback theme toggle also failed:', fallbackError);
+                }
+            }
+        });
+
+        // Load saved theme with error handling
+        try {
+            const savedTheme = localStorage.getItem('theme') || sessionStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        } catch (e) {
+            // If storage is blocked, default to light theme
+            document.documentElement.setAttribute('data-theme', 'light');
+            console.log('Theme storage not available, defaulting to light theme');
+        }
+
+        function addOutput(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status-${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            output.innerHTML = '';
+        }
+
+        fileInput.addEventListener('change', (e) => {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                addOutput(`Selected file: ${selectedFile.name}`, 'info');
+                processBtn.disabled = false;
+                exportBtn.disabled = true;
+                clearOutput();
+                addOutput(`Selected file: ${selectedFile.name}`, 'info');
+            } else {
+                processBtn.disabled = true;
+                exportBtn.disabled = true;
+            }
+        });
+
+        processBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            processBtn.disabled = true;
+            exportBtn.disabled = true;
+            clearOutput();
+
+            addOutput(`Processing file: ${selectedFile.name}`, 'progress');
+            addOutput(`File size: ${(selectedFile.size / 1024).toFixed(1)} KB`, 'info');
+
+            try {
+                const results = await processFile(selectedFile);
+                addOutput('Processing complete!', 'success');
+                addOutput(`Original data length: ${results.originalCount}`, 'info');
+                addOutput(`Len of processed data: ${results.processedCount}`, 'info');
+                addOutput(`Total Spills: ${results.totalSpills}`, 'info');
+                addOutput(`Total Spill duration (hrs): ${results.totalDuration.toFixed(3)}`, 'info');
+                addOutput(`Total execution time: ${results.executionTime.toFixed(1)}s`, 'info');
+
+                exportData = results.csvData;
+                exportBtn.disabled = false;
+            } catch (error) {
+                addOutput(`Error: ${error.message}`, 'error');
+            } finally {
+                processBtn.disabled = false;
+            }
+        });
+
+        exportBtn.addEventListener('click', () => {
+            if (!exportData) return;
+
+            const blob = new Blob([exportData], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `Spill Counter Results_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+
+            addOutput('Results exported successfully!', 'success');
+        });
+
+        async function processFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+
+                reader.onload = async (e) => {
+                    try {
+                        const arrayBuffer = e.target.result;
+                        let data;
+
+                        if (file.name.endsWith('.csv')) {
+                            const csvText = new TextDecoder('utf-8').decode(arrayBuffer);
+                            data = processCsvData(csvText);
+                        } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                            // Process Excel file
+                            data = await processExcelData(arrayBuffer);
+                        } else {
+                            throw new Error('Unsupported file type. Please use CSV or Excel (.xlsx) files.');
+                        }
+
+                        resolve(data);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+
+                reader.onerror = () => reject(new Error('Failed to read file'));
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function parseExactDate(dateString) {
+            // Try to parse yyyy-MM-dd HH:mm:ss format exactly
+            const exactRegex = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/;
+            const match = dateString.match(exactRegex);
+            if (match) {
+                const [, year, month, day, hour, minute, second] = match;
+                const date = new Date(year, month - 1, day, hour, minute, second);
+                // Validate that the date is valid and matches the input
+                if (date.getFullYear() == year && date.getMonth() == month - 1 &&
+                    date.getDate() == day && date.getHours() == hour &&
+                    date.getMinutes() == minute && date.getSeconds() == second) {
+                    return date;
+                }
+            }
+            // Return invalid date if exact format doesn't match
+            return new Date(NaN);
+        }
+
+        function roundToEven(value, decimals) {
+            const factor = Math.pow(10, decimals);
+            const scaled = value * factor;
+            const rounded = Math.round(scaled);
+            return rounded / factor;
+        }
+
+        function parseCsvLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            let i = 0;
+
+            while (i < line.length) {
+                const char = line[i];
+
+                if (char === '"') {
+                    if (inQuotes && line[i + 1] === '"') {
+                        // Escaped quote
+                        current += '"';
+                        i += 2;
+                    } else {
+                        // Toggle quote state
+                        inQuotes = !inQuotes;
+                        i++;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    // Field separator
+                    result.push(current);
+                    current = '';
+                    i++;
+                } else {
+                    current += char;
+                    i++;
+                }
+            }
+
+            // Add the last field
+            result.push(current);
+            return result;
+        }
+
+        // Basic Excel file reader
+        async function processExcelData(arrayBuffer) {
+            try {
+                addOutput('Reading Excel file...', 'progress');
+
+                // Load the ZIP archive
+                const zip = await JSZip.loadAsync(arrayBuffer);
+                addOutput('Excel file loaded as ZIP archive', 'info');
+
+                // List all files in the ZIP
+                const files = Object.keys(zip.files);
+                // addOutput(`Found ${files.length} files in Excel archive`, 'info');
+
+                // Load shared strings if available
+                let sharedStrings = [];
+                const sharedStringsFile = zip.file('xl/sharedStrings.xml');
+                if (sharedStringsFile) {
+                    const sharedStringsXml = await sharedStringsFile.async('text');
+                    sharedStrings = parseSharedStrings(sharedStringsXml);
+                    // addOutput(`Loaded ${sharedStrings.length} shared strings`, 'info');
+                }
+
+                // Find the worksheet (try multiple possible names)
+                let worksheetFile = null;
+                const possiblePaths = [
+                    'xl/worksheets/sheet1.xml',
+                    'xl/worksheets/worksheet1.xml',
+                    'xl/worksheets/sheet2.xml',
+                    'xl/worksheets/worksheet2.xml'
+                ];
+
+                for (const path of possiblePaths) {
+                    if (zip.file(path)) {
+                        worksheetFile = zip.file(path);
+                        // addOutput(`Found worksheet at: ${path}`, 'info');
+                        break;
+                    }
+                }
+
+                if (!worksheetFile) {
+                    // addOutput('Available worksheet files:', 'info');
+                    // files.filter(f => f.includes('worksheet')).forEach(file => addOutput(`  ${file}`, 'info'));
+                    throw new Error('Could not find worksheet in Excel file');
+                }
+
+                // Read the worksheet XML
+                const xmlText = await worksheetFile.async('text');
+                // addOutput(`Worksheet XML length: ${xmlText.length} characters`, 'info');
+
+                // Parse the XML to extract cell data
+                const cellData = parseExcelXML(xmlText, sharedStrings);
+                if (!cellData) {
+                    throw new Error('Failed to parse Excel XML');
+                }
+
+                addOutput(`Parsed ${cellData.length} rows from Excel`, 'info');
+
+                // Convert to CSV-like format for processing
+                const csvData = convertExcelToCsv(cellData);
+                addOutput(`Generated CSV with ${csvData.split('\n').length} lines`, 'info');
+
+                // Process as CSV
+                return processCsvData(csvData);
+
+            } catch (error) {
+                addOutput(`Excel processing error: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        function parseSharedStrings(xmlText) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+            const strings = xmlDoc.querySelectorAll('t, x\\:t');
+            const result = [];
+
+            for (let str of strings) {
+                result.push(str.textContent || '');
+            }
+
+            return result;
+        }
+
+        function parseExcelXML(xmlText, sharedStrings) {
+            try {
+                addOutput('Parsing Excel XML...', 'progress');
+
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+
+                // Check for XML parsing errors
+                const parseError = xmlDoc.querySelector('parsererror');
+                if (parseError) {
+                    addOutput(`XML parsing error: ${parseError.textContent}`, 'error');
+                    return null;
+                }
+
+                // Get all rows
+                const rows = xmlDoc.querySelectorAll('row, x\\:row');
+                // addOutput(`Found ${rows.length} rows in worksheet`, 'info');
+
+                if (rows.length === 0) {
+                    // Fallback to cells directly
+                    const cells = xmlDoc.querySelectorAll('c, x\\:c');
+                    // addOutput(`Fallback: Found ${cells.length} cells directly`, 'info');
+                    return parseCellsWithoutRows(cells, sharedStrings);
+                }
+
+                const data = {};
+                let totalCells = 0;
+
+                // Process each row
+                for (let rowIdx = 0; rowIdx < rows.length; rowIdx++) {
+                    const row = rows[rowIdx];
+                    const rowNum = rowIdx + 1; // Excel rows are 1-indexed
+
+                    // Get cells in this row
+                    const cells = row.querySelectorAll('c, x\\:c');
+
+                    for (let colIdx = 0; colIdx < cells.length; colIdx++) {
+                        const cell = cells[colIdx];
+                        const colNum = colIdx + 1; // Excel columns are 1-indexed
+
+                        // Create cell reference (e.g., "A1", "B2")
+                        const ref = columnNumberToLetter(colNum) + rowNum;
+
+                        // Handle namespace attributes
+                        const type = cell.getAttribute('t') || cell.getAttribute('x:t');
+                        let value = '';
+
+                        // Get cell value - try different XML structures
+                        const valueElement = cell.querySelector('v') || cell.querySelector('x\\:v');
+                        const inlineStrElement = cell.querySelector('is t') || cell.querySelector('x\\:is x\\:t');
+
+                        if (valueElement) {
+                            value = valueElement.textContent || '';
+                        } else if (inlineStrElement) {
+                            value = inlineStrElement.textContent || '';
+                        }
+
+                        // Handle shared strings
+                        if (type === 's' && sharedStrings && sharedStrings.length > 0) {
+                            const index = parseInt(value);
+                            if (!isNaN(index) && index < sharedStrings.length) {
+                                value = sharedStrings[index];
+                            }
+                        }
+
+                        // Skip debug output for individual cells
+
+                        data[ref] = value;
+                        totalCells++;
+                    }
+                }
+
+                // addOutput(`Processed ${totalCells} total cells`, 'info');
+
+                // Convert to 2D array
+                const result = convertCellDataToArray(data);
+                // addOutput(`Converted to ${result.length} data rows`, 'info');
+
+                return result;
+
+            } catch (error) {
+                addOutput(`XML parsing failed: ${error.message}`, 'error');
+                return null;
+            }
+        }
+
+        function columnNumberToLetter(num) {
+            let result = '';
+            while (num > 0) {
+                num--; // Adjust for 1-based indexing
+                result = String.fromCharCode(65 + (num % 26)) + result;
+                num = Math.floor(num / 26);
+            }
+            return result;
+        }
+
+        function columnToNumber(col) {
+            let result = 0;
+            for (let i = 0; i < col.length; i++) {
+                result = result * 26 + (col.charCodeAt(i) - 64);
+            }
+            return result;
+        }
+
+        function parseCellsWithoutRows(cells, sharedStrings) {
+            // Fallback for Excel files without explicit row structure
+            addOutput('Using fallback cell parsing (no row structure)', 'info');
+            const data = {};
+
+            for (let i = 0; i < cells.length; i++) {
+                const cell = cells[i];
+                const ref = cell.getAttribute('r') || cell.getAttribute('x:r');
+
+                if (ref) {
+                    const type = cell.getAttribute('t') || cell.getAttribute('x:t');
+                    let value = '';
+
+                    const valueElement = cell.querySelector('v') || cell.querySelector('x\\:v');
+                    const inlineStrElement = cell.querySelector('is t') || cell.querySelector('x\\:is x\\:t');
+
+                    if (valueElement) {
+                        value = valueElement.textContent || '';
+                    } else if (inlineStrElement) {
+                        value = inlineStrElement.textContent || '';
+                    }
+
+                    if (type === 's' && sharedStrings && sharedStrings.length > 0) {
+                        const index = parseInt(value);
+                        if (!isNaN(index) && index < sharedStrings.length) {
+                            value = sharedStrings[index];
+                        }
+                    }
+
+                    data[ref] = value;
+                }
+            }
+
+            return convertCellDataToArray(data);
+        }
+
+        function convertCellDataToArray(data) {
+            // Convert cell reference data to 2D array
+            const rows = {};
+            let maxRow = 0;
+            let maxCol = 0;
+
+            for (const [ref, value] of Object.entries(data)) {
+                const match = ref.match(/^([A-Z]+)(\d+)$/);
+                if (match) {
+                    const col = columnToNumber(match[1]);
+                    const row = parseInt(match[2]);
+
+                    maxRow = Math.max(maxRow, row);
+                    maxCol = Math.max(maxCol, col);
+
+                    if (!rows[row]) rows[row] = {};
+                    rows[row][col] = value;
+                }
+            }
+
+            // addOutput(`Data range: ${maxRow} rows, ${maxCol} columns`, 'info');
+
+            // Convert to array of arrays
+            const result = [];
+            const rowNumbers = Object.keys(rows).map(Number).sort((a, b) => a - b);
+
+            for (const rowNum of rowNumbers) {
+                const row = rows[rowNum];
+                const rowArray = [];
+
+                for (let col = 1; col <= maxCol; col++) {
+                    rowArray.push(row[col] || '');
+                }
+
+                result.push(rowArray);
+            }
+
+            return result;
+        }
+
+        function convertExcelToCsv(cellData) {
+            // Convert 2D array to CSV text
+            const csvLines = cellData.map(row =>
+                row.map(cell => {
+                    // Escape quotes and wrap in quotes if contains comma or quote
+                    const cellStr = String(cell || '');
+                    if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+                        return '"' + cellStr.replace(/"/g, '""') + '"';
+                    }
+                    return cellStr;
+                }).join(',')
+            );
+
+            return csvLines.join('\n');
+        }
+
+        function processCsvData(csvText) {
+            const startTime = Date.now();
+            const lines = csvText.split('\n').filter(line => line.trim());
+            const headers = parseCsvLine(lines[0]).map(h => h.trim().toLowerCase());
+
+            // Find column indices
+            const uniqueIdIndex = headers.findIndex(h => h === 'uniqueid' || h === 'unique_id');
+            const pointIdIndex = headers.findIndex(h => h === 'pointid' || h === 'point_id');
+            const splitEventIdIndex = headers.findIndex(h => h === 'spliteventid' || h === 'split_event_id');
+            const startIndex = headers.findIndex(h => h === 'start');
+            const stopIndex = headers.findIndex(h => h === 'stop');
+
+            addOutput(`Column indices - UniqueId: ${uniqueIdIndex}, PointId: ${pointIdIndex}, SplitEventId: ${splitEventIdIndex}, Start: ${startIndex}, Stop: ${stopIndex}`, 'info');
+
+            if (uniqueIdIndex === -1 || startIndex === -1 || stopIndex === -1) {
+                throw new Error('CSV must contain UniqueId, Start, and Stop columns');
+            }
+
+            const rawData = [];
+            for (let i = 1; i < lines.length; i++) {
+                const cells = parseCsvLine(lines[i]);
+                if (cells.length >= Math.max(uniqueIdIndex, pointIdIndex, splitEventIdIndex, startIndex, stopIndex) + 1) {
+                    try {
+                        const uniqueId = cells[uniqueIdIndex]?.trim() || '';
+                        const pointId = cells[pointIdIndex]?.trim() || '';
+                        const splitEventId = cells[splitEventIdIndex]?.trim() || '';
+                        const start = cells[startIndex]?.trim() || '';
+                        const stop = cells[stopIndex]?.trim() || '';
+
+                        if (uniqueId && start && stop) {
+                            rawData.push({
+                                uniqueId: uniqueId,
+                                pointId: pointId,
+                                splitEventId: splitEventId,
+                                start: start,
+                                stop: stop
+                            });
+                        }
+                    } catch (e) {
+                        // Skip invalid rows
+                    }
+                }
+            }
+
+            addOutput(`CSV parsing complete: ${rawData.length} rows loaded`, 'info');
+
+            // Process using the same algorithm as desktop version
+            const processingResult = processSpillData(rawData);
+            const executionTime = (Date.now() - startTime) / 1000;
+
+            // Generate CSV output
+            let csvOutput = 'UniqueId,First_SplitEventId,First_Spill_Start_Time,Last_Spill_End_Time,Time_Window_End,Spill_Count,Spill_Block_Duration_hrs,Actual_Spill_Duration_hrs\n';
+            processingResult.processedData.forEach(record => {
+                csvOutput += `${record.uniqueId},${record.firstSplitEventId},${record.firstSpillStartTime},${record.lastSpillEndTime},${record.timeWindowEnd},${record.spillCount},${record.spillBlockDurationHrs},${record.actualSpillDurationHrs}\n`;
+            });
+
+            return {
+                originalCount: processingResult.validRecordCount,
+                processedCount: processingResult.processedData.length,
+                totalSpills: processingResult.processedData.reduce((sum, r) => sum + r.spillCount, 0),
+                totalDuration: processingResult.processedData.reduce((sum, r) => sum + r.actualSpillDurationHrs, 0),
+                executionTime: executionTime,
+                csvData: csvOutput
+            };
+        }
+
+        function processSpillData(rawData) {
+            addOutput(`Starting spill data processing with ${rawData.length} raw records`, 'progress');
+
+            // Parse dates
+            const parsedData = [];
+            let parseErrors = 0;
+            for (const row of rawData) {
+                try {
+                    // Try exact format first: yyyy-MM-dd HH:mm:ss
+                    let startDate = parseExactDate(row.start);
+                    let stopDate = parseExactDate(row.stop);
+
+                    // If exact format fails, try more lenient parsing (to match C# TryParse)
+                    if (isNaN(startDate.getTime())) {
+                        startDate = new Date(row.start);
+                    }
+                    if (isNaN(stopDate.getTime())) {
+                        stopDate = new Date(row.stop);
+                    }
+
+                    if (isNaN(startDate.getTime()) || isNaN(stopDate.getTime())) {
+                        throw new Error(`Invalid dates: ${row.start} - ${row.stop}`);
+                    }
+
+                    parsedData.push({
+                        uniqueId: row.uniqueId,
+                        pointId: row.pointId,
+                        splitEventId: row.splitEventId,
+                        start: row.start,
+                        stop: row.stop,
+                        startDate: startDate,
+                        stopDate: stopDate
+                    });
+                } catch (e) {
+                    parseErrors++;
+                    if (parseErrors <= 5) { // Only log first few errors
+                        addOutput(`Parse error for ${row.uniqueId}: ${e.message}`, 'error');
+                    }
+                }
+            }
+
+            addOutput(`Date parsing complete: ${parsedData.length} valid records, ${parseErrors} parse errors`, 'info');
+
+            // Pyewipe AnW0507 transformation (Grimsby rules)
+            const dfPyewipeAnw0507 = parsedData.filter(r => r.uniqueId === 'AnW0507');
+            const dfNoPyewipeAnw0507 = parsedData.filter(r => r.uniqueId !== 'AnW0507');
+
+            const dfTransformedPyewipeAnw0507 = [];
+
+            if (dfPyewipeAnw0507.length > 0) {
+                addOutput(`Found ${dfPyewipeAnw0507.length} AnW0507 records requiring special Pyewipe TPS transformation`, 'info');
+                
+                // Include ALL records from both pump (12166671) and high/low (12149094) points
+                const df_12166671 = dfPyewipeAnw0507.filter(r => r.pointId === '12166671');
+                const df_12149094 = dfPyewipeAnw0507.filter(r => r.pointId === '12149094');
+                
+                addOutput(`Pump records (12166671): ${df_12166671.length}, High/Low records (12149094): ${df_12149094.length}`, 'info');
+
+                // Combine ALL records from both points and sort by start time
+                const combined_all = [...df_12166671, ...df_12149094].sort((a, b) => a.startDate - b.startDate);
+
+                if (combined_all.length > 0) {
+                    // Merge overlapping intervals: take earliest start and latest stop
+                    let currentStart = combined_all[0].startDate;
+                    let currentEnd = combined_all[0].stopDate;
+                    let currentPoints = new Set([combined_all[0].pointId]);
+
+                    for (let i = 1; i < combined_all.length; i++) {
+                        const start = combined_all[i].startDate;
+                        const end = combined_all[i].stopDate;
+                        const pid = combined_all[i].pointId;
+
+                        // If overlaps or touches (start <= current_end) then merge
+                        if (start <= currentEnd) {
+                            // Extend end if necessary
+                            if (end > currentEnd) {
+                                currentEnd = end;
+                            }
+                            currentPoints.add(pid);
+                        } else {
+                            // Push current merged interval
+                            dfTransformedPyewipeAnw0507.push({
+                                uniqueId: 'AnW0507',
+                                pointId: '90507123',
+                                splitEventId: `AnW0507${String(dfTransformedPyewipeAnw0507.length + 1).padStart(2, '0')}`,
+                                start: currentStart.toISOString().slice(0, 19).replace('T', ' '),
+                                stop: currentEnd.toISOString().slice(0, 19).replace('T', ' '),
+                                startDate: currentStart,
+                                stopDate: currentEnd
+                            });
+                            // Reset for next interval
+                            currentStart = start;
+                            currentEnd = end;
+                            currentPoints = new Set([pid]);
+                        }
+                    }
+                    
+                    // Push the last merged interval
+                    dfTransformedPyewipeAnw0507.push({
+                        uniqueId: 'AnW0507',
+                        pointId: '90507123',
+                        splitEventId: `AnW0507${String(dfTransformedPyewipeAnw0507.length + 1).padStart(2, '0')}`,
+                        start: currentStart.toISOString().slice(0, 19).replace('T', ' '),
+                        stop: currentEnd.toISOString().slice(0, 19).replace('T', ' '),
+                        startDate: currentStart,
+                        stopDate: currentEnd
+                    });
+                }
+                
+                addOutput(`AnW0507 Pyewipe TPS transformation complete: ${dfTransformedPyewipeAnw0507.length} merged intervals created`, 'success');
+            }
+
+            // Combine transformed data
+            const data = [...dfTransformedPyewipeAnw0507, ...dfNoPyewipeAnw0507];
+
+            // Get unique points
+            const uniquePoints = [...new Set(data.map(r => r.uniqueId))].sort();
+            addOutput(`Found ${uniquePoints.length} unique points to process`, 'info');
+
+            // Create data by unique ID
+            const dataByUniqueId = {};
+            for (const point of uniquePoints) {
+                dataByUniqueId[point] = data.filter(r => r.uniqueId === point).sort((a, b) => a.startDate - b.startDate);
+            }
+
+            const firstSpillPeriodHrs = 12;
+            const stopSpillPeriodHrs = 24;
+
+            const newData = [];
+
+            for (const uniqueId of uniquePoints) {
+                const eventData = dataByUniqueId[uniqueId];
+                if (!eventData || eventData.length === 0) continue;
+
+                let rowSpill = null;
+                let previousRow = null;
+                let beginning = true;
+                let actualDuration = 0;
+                let timeWindow = new Date(0);
+
+                const lastIdx = eventData.length - 1;
+
+                for (let idx = 0; idx <= lastIdx; idx++) {
+                    const row = eventData[idx];
+
+                    if (beginning) {
+                        rowSpill = row;
+                        previousRow = row;
+                        actualDuration = (row.stopDate - row.startDate) / (1000 * 60 * 60); // hours
+                        timeWindow = new Date(rowSpill.startDate.getTime() + firstSpillPeriodHrs * 60 * 60 * 1000);
+                        beginning = false;
+
+                        // Check if this row extends into next time windows
+                        while (row.stopDate >= timeWindow && row.startDate < new Date(timeWindow.getTime() + stopSpillPeriodHrs * 60 * 60 * 1000)) {
+                            timeWindow = new Date(timeWindow.getTime() + stopSpillPeriodHrs * 60 * 60 * 1000);
+                        }
+                    } else {
+                        // Check if we need to start a new block
+                        if (row.startDate >= new Date(timeWindow.getTime() + stopSpillPeriodHrs * 60 * 60 * 1000)) {
+                            // Write current block
+                            const blockDuration = (previousRow.stopDate - rowSpill.startDate) / (1000 * 60 * 60);
+
+                            const diffHrs = (previousRow.stopDate - rowSpill.startDate) / (1000 * 60 * 60);
+                            let spillCount;
+                            if (diffHrs > 12) {
+                                spillCount = 1;
+                                const timeAdj = new Date(rowSpill.startDate.getTime() + 12 * 60 * 60 * 1000);
+                                const diffHrs2 = (previousRow.stopDate - timeAdj) / (1000 * 60 * 60);
+                                spillCount += Math.ceil(diffHrs2 / 24);
+                            } else {
+                                spillCount = 1;
+                            }
+
+                            newData.push({
+                                uniqueId: uniqueId,
+                                firstSplitEventId: rowSpill.splitEventId,
+                                firstSpillStartTime: rowSpill.startDate.toISOString().slice(0, 19).replace('T', ' '),
+                                lastSpillEndTime: previousRow.stopDate.toISOString().slice(0, 19).replace('T', ' '),
+                                timeWindowEnd: timeWindow.toISOString().slice(0, 19).replace('T', ' '),
+                                spillCount: spillCount,
+                                spillBlockDurationHrs: roundToEven(blockDuration, 3),
+                                actualSpillDurationHrs: roundToEven(actualDuration, 3)
+                            });
+
+                            // Start new block
+                            rowSpill = row;
+                            previousRow = row;
+                            actualDuration = (row.stopDate - row.startDate) / (1000 * 60 * 60);
+                            timeWindow = new Date(rowSpill.startDate.getTime() + firstSpillPeriodHrs * 60 * 60 * 1000);
+
+                            // Check if this row extends into next time windows
+                            while (row.stopDate >= timeWindow && row.startDate < new Date(timeWindow.getTime() + stopSpillPeriodHrs * 60 * 60 * 1000)) {
+                                timeWindow = new Date(timeWindow.getTime() + stopSpillPeriodHrs * 60 * 60 * 1000);
+                            }
+                        } else {
+                            // Continue current block
+                            actualDuration += (row.stopDate - row.startDate) / (1000 * 60 * 60);
+                            previousRow = row;
+
+                            // Extend time window if row extends into it
+                            while (row.stopDate >= timeWindow && row.startDate < new Date(timeWindow.getTime() + stopSpillPeriodHrs * 60 * 60 * 1000)) {
+                                timeWindow = new Date(timeWindow.getTime() + stopSpillPeriodHrs * 60 * 60 * 1000);
+                            }
+                        }
+                    }
+
+                    // Handle last row
+                    if (idx === lastIdx) {
+                        const blockDuration = (previousRow.stopDate - rowSpill.startDate) / (1000 * 60 * 60);
+
+                        const diffHrs = (previousRow.stopDate - rowSpill.startDate) / (1000 * 60 * 60);
+                        let spillCount;
+                        if (diffHrs > 12) {
+                            spillCount = 1;
+                            const timeAdj = new Date(rowSpill.startDate.getTime() + 12 * 60 * 60 * 1000);
+                            const diffHrs2 = (previousRow.stopDate - timeAdj) / (1000 * 60 * 60);
+                            spillCount += Math.ceil(diffHrs2 / 24);
+                        } else {
+                            spillCount = 1;
+                        }
+
+                        newData.push({
+                            uniqueId: uniqueId,
+                            firstSplitEventId: rowSpill.splitEventId,
+                            firstSpillStartTime: rowSpill.startDate.toISOString().slice(0, 19).replace('T', ' '),
+                            lastSpillEndTime: previousRow.stopDate.toISOString().slice(0, 19).replace('T', ' '),
+                            timeWindowEnd: timeWindow.toISOString().slice(0, 19).replace('T', ' '),
+                            spillCount: spillCount,
+                            spillBlockDurationHrs: roundToEven(blockDuration, 3),
+                            actualSpillDurationHrs: roundToEven(actualDuration, 3)
+                        });
+                    }
+                }
+            }
+
+            return {
+                processedData: newData,
+                validRecordCount: data.length
+            };
+        }
+
+        // Initialize
+        addOutput('Spill Counter ready - Select a CSV or Excel (.xlsx) file to begin', 'info');
+    </script>
+</body>
+</html>
